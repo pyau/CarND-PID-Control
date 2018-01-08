@@ -35,7 +35,7 @@ void PID::Init(double Kp_, double Kd_, double Ki_) {
 
     time(&prev_time);
     step = 0;
-    twiddle = false;
+    twiddle = false;    // set to true for twiddle
     run = 0;
 }
 
@@ -66,8 +66,8 @@ bool PID::UpdateError(double cte) {
 
     // twiddle
 
-    int step_settle = 200;//150;
-    int step_run = 2000;//500;
+    int step_settle = 200;//150;    // settle step
+    int step_run = 2000;//500;      // how many steps simulation should run
     int step_tot = step_settle + step_run;
 
     if ( twiddle == true ) {

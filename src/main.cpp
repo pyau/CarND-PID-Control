@@ -33,7 +33,11 @@ int main()
   uWS::Hub h;
 
   PID pid;
-  // TODO: Initialize the pid variable.
+  // PID variable is chosen using twiddle.
+  // First, I find values that can drive through a small portion of the track, and
+  // have twiddle tune the parameters to drive well in that portion. Then I gradually
+  // increase the steps that twiddle will run simulation on, to find parameters that
+  // can finish the whole track.
 //  pid.Init(1.0,1.0,0.01);
 //  pid.Init(0.802, 8.48849, 0.014177); // from 150 steps
 //  pid.Init(0.800236, 14.1079, 0.014177);
