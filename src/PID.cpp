@@ -7,6 +7,8 @@ using namespace std;
 /*
 * TODO: Complete the PID class.
 */
+double deg2rad(double x) { return x * M_PI / 180; }
+double rad2deg(double x) { return x * 180 / M_PI; }
 
 PID::PID() {}
 
@@ -19,9 +21,9 @@ void PID::Init(double Kp_, double Kd_, double Ki_) {
     bestKp = 0.0;
     bestKi = 0.0;
     bestKd = 0.0;
-    dp[0] = 0.2*Kp_;
-    dp[1] = 0.2*Kd_;
-    dp[2] = 0.2*Ki_;
+    dp[0] = 0.1*Kp_;
+    dp[1] = 0.1*Kd_;
+    dp[2] = 0.1*Ki_;
     p_error = 0.0;
     i_error = 0.0;
     d_error = 0.0;
@@ -35,12 +37,12 @@ void PID::Init(double Kp_, double Kd_, double Ki_) {
 
     time(&prev_time);
     step = 0;
-    twiddle = false;    // set to true for twiddle
+    twiddle = true;    // set to true for twiddle
     run = 0;
 }
 
 double PID::CalculateSteer(double speed) {
-    double steer = -Kp   *p_error - Kd  *d_error - Ki *i_error;
+    double steer = (-Kp   *p_error - Kd  *d_error - Ki *i_error) / deg2rad(25.0);
     if (steer > 1)
         steer = 1;
     else if (steer < -1)
@@ -49,7 +51,12 @@ double PID::CalculateSteer(double speed) {
 }
 
 bool PID::UpdateError(double cte) {
-
+    clock_t timev = clock();
+    //double diff_cte;
+    timev = clock();
+    double dtime = (timev - prev_time)/ (double)CLOCKS_PER_SEC;
+    //cout << dtime << endl;
+    prev_time = timev;
     if (first_step) {
         first_step = false;
         p_error = cte;
@@ -57,17 +64,17 @@ bool PID::UpdateError(double cte) {
         d_error = 0.0;
     } else {
         p_error = cte;
-        d_error = (cte - prev_cte);
+        d_error = (cte - prev_cte);// / dtime;
         prev_cte = cte;
     }
-    i_error += cte;
+    i_error += cte;// * dtime;
 
     step++;
 
     // twiddle
 
-    int step_settle = 200;//150;    // settle step
-    int step_run = 2000;//500;      // how many steps simulation should run
+    int step_settle = 100;    // settle step
+    int step_run = 1500;      // how many steps simulation should run
     int step_tot = step_settle + step_run;
 
     if ( twiddle == true ) {

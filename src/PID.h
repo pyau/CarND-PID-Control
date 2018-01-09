@@ -1,6 +1,7 @@
 #ifndef PID_H
 #define PID_H
 #include <time.h>
+#include <ctime>
 class PID {
 public:
   /*
@@ -29,7 +30,7 @@ public:
   double best_error;
   int curr_index;
   bool increasing[3];
-  time_t prev_time;
+  clock_t prev_time;
   int step;
 
   bool twiddle;
@@ -65,6 +66,7 @@ public:
   void ScaleParamDown(int ind); 
 
   double CalculateSteer(double speed);
+  //double CalculateThrottle();
 };
 
 #endif /* PID_H */
