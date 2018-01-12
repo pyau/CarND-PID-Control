@@ -37,62 +37,28 @@ There's an experimental patch for windows in this [PR](https://github.com/udacit
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
-## Editor Settings
+## PID gain optimization
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+To improve the performance of steering controller I implemented twiddle to tune the gains. Twiddle works as follow.
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+1. I assigned default gains all of proportional, integral and derivative controllers, and run simulation using default gains, and record current error.
+2. Then I increment proportional gain by the delta rate of 0.1, and run simulation to see if the new error beats the previous best error.
+3. If the new error beats the previous best, then I multiply the delta rate of increasing by 1.1, and see if simulation gives better (lower) error.
+4. When the new error from incrementing does not beat the previous best, I decrease the gain by 2 times of the current delta rate.  And repeatedly decrease the gain by multiplying the negative delta rate if the error keeps getting lower.
+5. When the new error from decrementing does not beat the previous best, I added back the delta rate gain so it stays at the gain with best error. Then I make the delta rate smaller, to be 0.9 of this cycle's delta rate. This delta rate will be used next time we tune the same parameters.
+6. Then I move on to the next controller D and repeat steps 2 to 5, and then the I controller, and then go back to the P controller.
 
-## Code Style
+I used the following steps to actually getting to the values that I used for steering.
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+1. First, assign some reasonable values for P, I and D.  Since the simulation should not have much steering bias, if at all, I started out assigning I gain with a very small value (0.001), P and D have the same value (0.1).
+2. Run twiddle with just a few steps, to make sure the car can drive on the first straight line without turning out of lane.
+3. Then slowly increase the number of steps for simulation to include the first turn, and subsequent turns, and finally finishing the one lap.
 
-## Project Instructions and Rubric
+Some manual tuning of parameters was also used. At one point, my car was driving on a curve even during a straight line. I then increased the D gain parameter aggressively to make the car drive more straight.  Also, some of the simulations that I ran gave very high values for both P and D.  Based on reading https://udacity-reviews-uploads.s3.amazonaws.com/_attachments/41330/1493863065/pid_control_document.pdf, I discovered that D value should not be too high for improving stability.
 
-Note: regardless of the changes you make, your project must be buildable using
-cmake and make!
+For the throttle, I keep the car to drive constantly at 40 mph.  The value that I chose seem to do the job so I did not do twiddling on this.
 
-More information is only accessible by people who are already enrolled in Term 2
-of CarND. If you are enrolled, see [the project page](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/f1820894-8322-4bb3-81aa-b26b3c6dcbaf/lessons/e8235395-22dd-4b87-88e0-d108c5e5bbf4/concepts/6a4d8d42-6a04-4aa6-b284-1697c0fd6562)
-for instructions and the project rubric.
+## Results
 
-## Hints!
-
-* You don't have to follow this directory structure, but if you do, your work
-  will span all of the .cpp files here. Keep an eye out for TODOs.
-
-## Call for IDE Profiles Pull Requests
-
-Help your fellow students!
-
-We decided to create Makefiles with cmake to keep this project as platform
-agnostic as possible. Similarly, we omitted IDE profiles in order to we ensure
-that students don't feel pressured to use one IDE or another.
-
-However! I'd love to help people get up and running with their IDEs of choice.
-If you've created a profile for an IDE that you think other students would
-appreciate, we'd love to have you add the requisite profile files and
-instructions to ide_profiles/. For example if you wanted to add a VS Code
-profile, you'd add:
-
-* /ide_profiles/vscode/.vscode
-* /ide_profiles/vscode/README.md
-
-The README should explain what the profile does, how to take advantage of it,
-and how to install it.
-
-Frankly, I've never been involved in a project with multiple IDE profiles
-before. I believe the best way to handle this would be to keep them out of the
-repo root to avoid clutter. My expectation is that most profiles will include
-instructions to copy files to a new location to get picked up by the IDE, but
-that's just a guess.
-
-One last note here: regardless of the IDE used, every submitted project must
-still be compilable with cmake and make./
-
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
-
+The following video records the result of the simulation finishes one lap.
+https://youtu.be/SR4421bYRYU
