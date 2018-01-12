@@ -37,8 +37,11 @@ void PID::Init(double Kp_, double Kd_, double Ki_) {
 
     time(&prev_time);
     step = 0;
-    twiddle = true;    // set to true for twiddle
     run = 0;
+}
+
+void PID::EnableTwiddle(bool t) {
+    twiddle = t;
 }
 
 double PID::CalculateSteer(double speed) {
@@ -48,6 +51,16 @@ double PID::CalculateSteer(double speed) {
     else if (steer < -1)
         steer = -1;
     return steer;
+}
+
+double PID::CalculateThrottle() {
+    double throttle = (Kp   *p_error + Kd  *d_error + Ki *i_error);
+    //cout << throttle << endl;
+    //if (throttle > 1)
+    //    throttle = 1;
+    //else if (throttle < 0)
+    //    throttle = 0;
+    return throttle;
 }
 
 bool PID::UpdateError(double cte) {
@@ -74,7 +87,7 @@ bool PID::UpdateError(double cte) {
     // twiddle
 
     int step_settle = 100;    // settle step
-    int step_run = 1500;      // how many steps simulation should run
+    int step_run = 1300;      // how many steps simulation should run
     int step_tot = step_settle + step_run;
 
     if ( twiddle == true ) {

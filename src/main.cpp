@@ -42,8 +42,15 @@ int main()
 //  pid.Init(0.802, 8.48849, 0.014177); // from 150 steps
 //  pid.Init(0.800236, 14.1079, 0.014177);
 //  pid.Init(0.684728, 16.9295, 0.0116251); // from 1200 steps
-  pid.Init(0.225, 4.4, 0.000900883);
-  h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
+//  pid.Init(0.320685, 4.84, 0.000900883);
+//  pid.Init(0.1, 2, 0.00001);
+  pid.Init(0.133881, 1.4042, 0.00001);
+  pid.EnableTwiddle(false);
+
+  PID pidt;
+  pidt.Init(0.2,0.2,0.001);
+  pidt.EnableTwiddle(false);
+  h.onMessage([&pid, &pidt](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
     // The 2 signifies a websocket event
@@ -72,12 +79,19 @@ int main()
           }
           steer_value = pid.CalculateSteer(speed);
 
+          bool reset2 = pidt.UpdateError(40-speed);
+          if (reset2 == true) {
+            std::string reset_msg = "42[\"reset\",{}]";
+            ws.send(reset_msg.data(), reset_msg.length(), uWS::OpCode::TEXT);
+          }
+          double throttle;
+          throttle = pidt.CalculateThrottle();
           // DEBUG
           //std::cout << "CTE: " << cte << " Steering Value: " << steer_value << std::endl;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = 0.5;
+          msgJson["throttle"] = throttle;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
           //std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);

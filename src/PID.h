@@ -66,7 +66,8 @@ public:
   void ScaleParamDown(int ind); 
 
   double CalculateSteer(double speed);
-  //double CalculateThrottle();
+  double CalculateThrottle();
+  void EnableTwiddle(bool t);
 };
 
 #endif /* PID_H */
