@@ -6,8 +6,14 @@ Self-Driving Car Engineer Nanodegree Program
 ## P, I, D components
 
 The propotional component causes the car to steer propotionally to the lane center / CTE .  e.g, if the car is positioned far to the right, then P controller will steer the car to sharp left.  This is the main controller that steers the car in the correct direction.
+[P omitted](https://github.com/pyau/CarND-PID-Control/blob/master/videos/P_omitted.mp4)
+
+With P component omitted, the car never actually steer itself correctly towards the CTE.
 
 The derivative controller prevents the propotional controller from overshooting.  Propotional controller has a tendency to overshoot, and derivative contoller will slow down the steering if the difference between current error and previous error is big, which points to oversteering.
+[D omitted](https://github.com/pyau/CarND-PID-Control/blob/master/videos/D_omitted.mp4)
+
+With D component omitted, the car quickly overshoots and runs itself out of the track.
 
 The integral controller corrects the systemic bias that could cause P and D controllers to not approach CTE. In this project, however, the car can still finish a lap without using the I controller.
 
