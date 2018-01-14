@@ -30,7 +30,7 @@ public:
   double best_error;
   int curr_index;
   bool increasing[3];
-  clock_t prev_time;
+  //clock_t prev_time;
   int step;
 
   bool twiddle;

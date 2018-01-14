@@ -35,7 +35,7 @@ void PID::Init(double Kp_, double Kd_, double Ki_) {
     curr_index = 0;
     increasing[0] = increasing[1] = increasing[2] = true;
 
-    time(&prev_time);
+    //time(&prev_time);
     step = 0;
     run = 0;
 }
@@ -64,12 +64,12 @@ double PID::CalculateThrottle() {
 }
 
 bool PID::UpdateError(double cte) {
-    clock_t timev = clock();
+    //clock_t timev = clock();
     //double diff_cte;
-    timev = clock();
-    double dtime = (timev - prev_time)/ (double)CLOCKS_PER_SEC;
+    //timev = clock();
+    //double dtime = (timev - prev_time)/ (double)CLOCKS_PER_SEC;
     //cout << dtime << endl;
-    prev_time = timev;
+    //prev_time = timev;
     if (first_step) {
         first_step = false;
         p_error = cte;
